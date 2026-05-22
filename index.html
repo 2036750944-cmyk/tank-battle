@@ -170,11 +170,21 @@ const ctx = canvas.getContext('2d');
 const TILE = 30;
 const COLS = 26;
 const ROWS = 20;
+const BASE_COL = Math.floor(COLS / 2 - 1);
+const BASE_ROW = ROWS - 2;
+const PLAYER_SPAWN_COL = BASE_COL - 1.5;
+const PLAYER_SPAWN_ROW = ROWS - 0.5;
 
 // Directions
 const DIR = { UP: 0, RIGHT: 1, DOWN: 2, LEFT: 3 };
 const DX = [0, 1, 0, -1];
 const DY = [-1, 0, 1, 0];
+
+function resetPlayerPosition(tank) {
+  tank.x = PLAYER_SPAWN_COL * TILE;
+  tank.y = PLAYER_SPAWN_ROW * TILE;
+  tank.dir = DIR.UP;
+}
 
 // Game state
 let score = 0;
@@ -306,7 +316,8 @@ class Tank {
 }
 
 function createPlayer() {
-  const tank = new Tank(COLS * TILE / 2, (ROWS - 1) * TILE + TILE / 2, DIR.UP, '#4fc3f7', true);
+  const tank = new Tank(0, 0, DIR.UP, '#4fc3f7', true);
+  resetPlayerPosition(tank);
   tank.speed = 3;
   return tank;
 }
@@ -339,8 +350,8 @@ function parseMap(mapData) {
     }
   }
   base = {
-    x: Math.floor(COLS / 2 - 1) * TILE,
-    y: (ROWS - 1) * TILE,
+    x: BASE_COL * TILE,
+    y: BASE_ROW * TILE,
   };
 }
 
@@ -422,9 +433,7 @@ function nextLevel() {
   const mapIdx = (level - 1) % MAPS.length;
   parseMap(MAPS[mapIdx]);
   if (player) {
-    player.x = COLS * TILE / 2;
-    player.y = (ROWS - 1) * TILE + TILE / 2;
-    player.dir = DIR.UP;
+    resetPlayerPosition(player);
   }
   enemiesToSpawn = 4 + level * 2;
   enemiesRemaining = enemiesToSpawn;
